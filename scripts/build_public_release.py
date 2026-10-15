@@ -18,6 +18,7 @@ TOP = {"app.py", "public_app.py", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.m
        ".streamlit/config.toml", ".github/workflows/tests.yml"}
 DOCS = {"docs/LOCAL_USAGE.md", "docs/DEPLOYMENT.md", "docs/RELEASE_AUDIT.md"}
 SCREENSHOTS = {f"docs/screenshots/public-{mode}.jpg" for mode in ("single", "batch", "planning")}
+SCREENSHOTS |= {f"docs/screenshots/online-{mode}.jpg" for mode in ("single", "batch", "planning", "mitigation")}
 
 
 def allowed(path: str) -> bool:

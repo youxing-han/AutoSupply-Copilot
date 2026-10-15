@@ -1,6 +1,20 @@
 # Streamlit Community Cloud 部署
 
-当前状态：正在准备发布，尚未填写在线演示地址。只有实际部署并验证后才记录 URL。
+当前状态：**已部署并完成核心功能线上验收**（2026-10-15）。
+
+真实在线地址：https://autosupply-copilot.streamlit.app/
+
+公开源码：https://github.com/youxing-han/AutoSupply-Copilot
+
+首次 Ubuntu CI：201 项测试执行完毕，5 项 Windows 专用测试跳过，0 失败。
+补齐发布链接与截图检查后，本地最终回归为 202 项全部通过；后续 Linux 运行状态可在仓库 Actions 查看。
+首次成功运行：https://github.com/youxing-han/AutoSupply-Copilot/actions/runs/38668565677
+
+线上实际核验：单物料修改库存后重新分析、12 物料批量、Excel 与 CSV 上传分析、
+12 物料默认动态计划、五表 Excel 上传后的延期计划、订单影响、应急方案比较及缺失 AI 提示。
+全新无登录会话访问外层页面和应用入口均返回 200，无登录跳转。
+线上生成的 PDF 已实际下载、提取中文文本并渲染核对；模拟 Excel 已实际下载并检查 12 条记录。
+详细证据和限制见 `RELEASE_AUDIT.md`。
 
 ## 部署参数
 
@@ -29,6 +43,12 @@ Community Cloud 在 Linux 运行；应用使用基于 `__file__` 的项目相对
 - https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies
 
 ## 更新和故障处理
+
+原开发仓库继续保留旧 `origin`。新增 `public` remote 默认推送
+`codex/public-release:main`，该分支对应独立、经过审计的公开快照。
+不要直接把开发分支 `main` 推向公开仓库，否则会把原历史和不必要文件一起发布。
+本次公开检出目录位于开发仓库的 `.runtime/public-release`；该目录被忽略，
+不是发布文件的一部分。后续也可从 GitHub 重新克隆公开仓库进行维护。
 
 推送到 `main` 后平台通常自动更新；修改依赖会重新构建。构建失败时先查看管理页面日志，
 核对 Python 版本、依赖与入口。不要把含用户上传内容的日志贴到公开 issue。

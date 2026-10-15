@@ -21,6 +21,15 @@ from upload_safety import validate_upload
 
 
 class PublicCapabilityTests(unittest.TestCase):
+    def test_published_links_and_screenshots_are_complete(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertIn("https://autosupply-copilot.streamlit.app/", readme)
+        self.assertIn("https://github.com/youxing-han/AutoSupply-Copilot", readme)
+        for mode in ("single", "batch", "planning", "mitigation"):
+            path = ROOT / "docs/screenshots" / f"online-{mode}.jpg"
+            self.assertGreater(path.stat().st_size, 10_000)
+            self.assertEqual(path.read_bytes()[:3], b"\xff\xd8\xff")
+
     @patch.dict(os.environ, {"AUTOSUPPLY_MODE": "public"})
     def test_no_model_constructor_even_for_explicit_report_request(self):
         with patch.object(agents, "OllamaLLM", side_effect=AssertionError("model accessed")):

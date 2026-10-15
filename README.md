@@ -33,7 +33,10 @@ AutoSupply Copilot is an automotive supply-risk and material-planning demo built
 
 ## 在线演示与本地模式
 
-在线部署入口为 `public_app.py`。部署状态和经验证的访问地址见 [部署说明](docs/DEPLOYMENT.md)；尚未验证的地址不作为项目链接。
+**[直接打开在线演示](https://autosupply-copilot.streamlit.app/)** · **[GitHub 源码](https://github.com/youxing-han/AutoSupply-Copilot)**
+
+无需安装 Python 或 Ollama，也不需要开发者电脑保持开机。部署入口为 `public_app.py`，
+使用 Streamlit Community Cloud 和 Python 3.11；实际验证范围见 [部署说明](docs/DEPLOYMENT.md)。
 
 | 能力 | 公开演示模式 | 本地模式 |
 |---|---|---|
@@ -103,6 +106,10 @@ Windows 桌面快捷方式可由 `scripts/create_desktop_shortcuts.ps1` 创建�
 ## 真实页面截图
 
 以下是项目实际运行页面，不是效果图。截图来源和验证范围见 [发布检查记录](docs/RELEASE_AUDIT.md)。
+
+以下三张为本地公开模式截图；另有 [线上单物料](docs/screenshots/online-single.jpg)、
+[线上 Excel 分析](docs/screenshots/online-batch.jpg)、[线上动态计划](docs/screenshots/online-planning.jpg)
+和 [线上应急方案](docs/screenshots/online-mitigation.jpg) 的实际验收截图。
 
 ![单物料分析](docs/screenshots/public-single.jpg)
 
