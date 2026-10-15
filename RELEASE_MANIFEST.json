@@ -1,5 +1,5 @@
 {
-  "source_commit": "599e731fac90dbd43ca1e1cc3138ae05099c4f7b",
+  "source_commit": "095e36af03c94b626af43a4f07aa3764c97b603e",
   "file_count": 80,
   "sha256": {
     ".github/workflows/tests.yml": "6a466675eaed44fd7291c013c4e4167e986e365f1243c1befd03e2aed8e60699",
@@ -37,8 +37,8 @@
     "agent/workflow_runtime.py": "b35ce7588dd042366aba7301d5c25d2dd3a3d845c70dac9f38231cc928c6453e",
     "app.py": "acc8df8d1c03703352a3253b785a0317d7c3776f2f2d440452746d39efd8ecee",
     "docs/DEPLOYMENT.md": "a98805d3ef08256347842e3a96194519aafd79abd36f7a9d74fe84bbf6134875",
-    "docs/LOCAL_USAGE.md": "223d77ca8d0db5193e6683a1f5a4e6c3a9f3b30c2548b8923e659c95659c529b",
-    "docs/RELEASE_AUDIT.md": "dcb8d41de12d7d751edfc52b5cef96f4854aab13fc1b85a4d60a3aacc1ecab4f",
+    "docs/LOCAL_USAGE.md": "46126089ea053e70ccd17d59654a6ca7770a315347a5c1b7f0de307b9545b4a0",
+    "docs/RELEASE_AUDIT.md": "a59366a3665046d2efcebf8082f78311267b9e6ce9eecb1d300a95de0268aabe",
     "docs/prototypes/DESIGN.md": "d51b59c30488022b82953ea9511bc4e83875b8df0008c381e3c5ec03bfa769f6",
     "docs/prototypes/WEBSITE_DESIGN.md": "24a729c1d36beca7f04947658189ca62fe348c42101cdb2bbef25b5d3222583c",
     "docs/prototypes/build_planning_preview.py": "33bd405b8900aeed31d5ae2c521a3246d93131d43aae293200cda53fed6163c4",
