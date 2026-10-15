@@ -1,0 +1,6 @@
+part_code,part_name,supplier,current_stock,daily_usage,lead_time_days,supplier_status,criticality,backup_supplier,backup_supplier_available,destination_line,unit_cost,safety_days
+SEN-001,Sensor,VisionSense Components,800,80,7,NORMAL,MEDIUM,,False,Final Assembly Line 1,42.5,3
+BRG-002,Bearing,Precision Bearing Works,1500,100,5,NORMAL,MEDIUM,Northern Bearing Co.,True,Powertrain Line,18.2,2
+CTL-003,Controller,AutoControl Electronics,600,30,10,NORMAL,HIGH,,False,Electronic Control Line,186,4
+BRK-004,Brake Module,PrimeBrake Systems,400,20,8,NORMAL,HIGH,,False,Brake Assembly Line,245,3
+BAT-005,Battery Component,GreenCell Mobility,900,50,9,NORMAL,HIGH,VoltSource Industries,True,Battery Pack Line,132,3

@@ -1,0 +1,20 @@
+AutoSupply Copilot — installation
+
+Python 3.11 recommended. Run commands from the repository root.
+
+Windows PowerShell:
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.lock.txt
+.\.venv\Scripts\python.exe -m streamlit run app.py
+
+Linux / macOS:
+python3.11 -m venv .venv
+.venv/bin/python -m pip install -r requirements.lock.txt
+.venv/bin/python -m streamlit run app.py
+
+Core analysis does not require a model. For optional local AI, install Ollama
+from https://ollama.com/, pull llama3.2, and start the local service.
+
+Public demo: replace app.py with public_app.py. It blocks local model access.
+Cloud entrypoint: public_app.py, branch main, Python 3.11; no secrets required.
+See README.md and docs/DEPLOYMENT.md for Chinese instructions and limitations.
