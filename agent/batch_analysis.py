@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import csv
 import math
 from collections.abc import Callable
 from pathlib import Path
@@ -84,10 +85,15 @@ def read_batch_file(file_name: str, content: bytes) -> pd.DataFrame:
     source = io.BytesIO(content)
     if suffix == ".csv":
         try:
-            frame = pd.read_csv(source, encoding="utf-8-sig", nrows=MAX_BATCH_SKUS + 1)
+            decoded = content.decode("utf-8-sig")
         except UnicodeDecodeError:
-            source.seek(0)
-            frame = pd.read_csv(source, encoding="gb18030", nrows=MAX_BATCH_SKUS + 1)
+            decoded = content.decode("gb18030")
+        headers = next(csv.reader(io.StringIO(decoded)), [])
+        headers = [name.strip() for name in headers]
+        from upload_safety import MAX_COLUMNS
+        if not headers or len(headers) > MAX_COLUMNS or len(headers) != len(set(headers)):
+            raise ValueError("CSV 字段名不能为空或重复，且不得超过 40 列。")
+        frame = pd.read_csv(io.StringIO(decoded), nrows=MAX_BATCH_SKUS + 1)
         validate_frame_size(frame, MAX_BATCH_SKUS)
         return frame
     if suffix == ".xlsx":

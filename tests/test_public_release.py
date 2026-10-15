@@ -52,6 +52,12 @@ class PublicCapabilityTests(unittest.TestCase):
 
 
 class UploadSafetyTests(unittest.TestCase):
+    def test_csv_duplicate_or_excess_headers_rejected_before_dataframe_parse(self):
+        for payload in (b"part_code,part_code\na,b", (",".join(f"x{i}" for i in range(41)) + "\n").encode()):
+            with patch("batch_analysis.pd.read_csv", side_effect=AssertionError("parsed before header check")):
+                with self.assertRaises(ValueError):
+                    read_batch_file("unsafe.csv", payload)
+
     def test_release_allowlist_excludes_private_and_irrelevant_files(self):
         import importlib.util
         spec = importlib.util.spec_from_file_location("release_builder", ROOT / "scripts/build_public_release.py")

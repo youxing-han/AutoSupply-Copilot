@@ -11,6 +11,7 @@ showErrorDetails = "none"
 
 [server]
 maxUploadSize = 5
+maxMessageSize = 8
 enableXsrfProtection = true
 enableCORS = true
 
