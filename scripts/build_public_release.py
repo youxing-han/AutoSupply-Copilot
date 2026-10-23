@@ -16,10 +16,12 @@ ROOT = Path(__file__).resolve().parents[1]
 TOP = {"app.py", "public_app.py", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md",
        "requirements.txt", "requirements.lock.txt", "INSTALLATION.txt", ".gitignore",
        ".streamlit/config.toml", ".github/workflows/tests.yml"}
-DOCS = {"docs/LOCAL_USAGE.md", "docs/DEPLOYMENT.md", "docs/RELEASE_AUDIT.md"}
+DOCS = {"docs/LOCAL_USAGE.md", "docs/DEPLOYMENT.md", "docs/RELEASE_AUDIT.md", "docs/SCREENSHOTS.md"}
 SCREENSHOTS = {f"docs/screenshots/public-{mode}.jpg" for mode in ("single", "batch", "planning")}
 SCREENSHOTS |= {f"docs/screenshots/online-{mode}.jpg" for mode in ("single", "batch", "planning", "mitigation")}
 SCREENSHOTS |= {"docs/screenshots/material-risk-overview.png", "docs/screenshots/time-phased-inventory.png"}
+SCREENSHOTS |= {f"docs/screenshots/demo-{view}.jpg" for view in
+                ("risk-dashboard", "inventory-projection", "delivery-scenario", "mitigation-tradeoffs")}
 
 
 def allowed(path: str) -> bool:

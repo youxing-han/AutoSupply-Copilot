@@ -1,55 +1,46 @@
-# Streamlit Community Cloud 部署
+# Streamlit Community Cloud Deployment
 
-当前状态：**已部署并完成核心功能线上验收**（2026-10-15）。
+Live application: https://autosupply-copilot.streamlit.app/
 
-真实在线地址：https://autosupply-copilot.streamlit.app/
+Public repository: https://github.com/youxing-han/AutoSupply-Copilot
 
-公开源码：https://github.com/youxing-han/AutoSupply-Copilot
+The initial deployment and core online acceptance were completed on 2026-10-15. These are dated observations, not a claim of a fresh cloud acceptance run on every documentation update. See `RELEASE_AUDIT.md`.
 
-首次 Ubuntu CI：201 项测试执行完毕，5 项 Windows 专用测试跳过，0 失败。
-补齐发布链接与截图检查后，本地最终回归为 202 项全部通过；后续 Linux 运行状态可在仓库 Actions 查看。
-首次成功运行：https://github.com/youxing-han/AutoSupply-Copilot/actions/runs/38668565677
+## Deployment Settings
 
-线上实际核验：单物料修改库存后重新分析、12 物料批量、Excel 与 CSV 上传分析、
-12 物料默认动态计划、五表 Excel 上传后的延期计划、订单影响、应急方案比较及缺失 AI 提示。
-全新无登录会话访问外层页面和应用入口均返回 200，无登录跳转。
-线上生成的 PDF 已实际下载、提取中文文本并渲染核对；模拟 Excel 已实际下载并检查 12 条记录。
-详细证据和限制见 `RELEASE_AUDIT.md`。
+- Repository: `youxing-han/AutoSupply-Copilot`
+- Branch: `main`
+- Entrypoint: `public_app.py`
+- Python: `3.11`
+- Secrets: empty; do not add personal paths, a local Ollama URL or model API keys.
+- Dependencies: root `requirements.txt`; runtime configuration: `.streamlit/config.toml`.
 
-## 部署参数
+## Deploy or Inspect
 
-- GitHub 仓库：`youxing-han/AutoSupply-Copilot`
-- 分支：`main`
-- 应用入口：`public_app.py`
-- Advanced settings → Python version：`3.11`
-- Secrets：留空；无需 API Key，也不要填写本机路径或 Ollama 地址。
-- 依赖：根目录 `requirements.txt`；配置：`.streamlit/config.toml`。
+1. Sign in at https://share.streamlit.io/ and authorize the intended GitHub repository.
+2. Choose **Create app**, then deploy from GitHub.
+3. Enter the repository, branch and entrypoint above; select Python 3.11 in advanced settings.
+4. Keep the app publicly accessible and deploy. Wait for dependency installation and startup.
+5. Open the actual URL returned by the platform and test single-SKU, batch and dynamic planning, imports, downloads and the unavailable-AI notice.
 
-## 登录后操作
+The Linux runtime uses project-relative paths and in-memory Excel/PDF generation. The public entrypoint disables local model access and model tracing. The developer's computer need not stay on. Free-tier availability and sleep behavior depend on platform policy; no SLA is promised.
 
-1. 在 https://share.streamlit.io/ 登录，按平台提示授权需要部署的 GitHub 仓库。
-2. 点击 **Create app**，选择从 GitHub 部署。
-3. 填写上述仓库、分支和入口；在 **Advanced settings** 中选择 Python 3.11。
-4. 确认应用为公开可访问，点击 **Deploy**，等待依赖安装和应用启动。
-5. 打开平台实际返回的 URL。运行单物料、批量和动态分析，检查模板、PDF 下载与缺失 AI 提示。
-6. 将经过验证的地址补入 README 和本文件，不把自拟子域名当作已部署地址。
+## Updates
 
-Community Cloud 在 Linux 运行；应用使用基于 `__file__` 的项目相对路径，Excel 与 PDF
-在内存生成，不依赖 Windows 快捷方式。公开入口固定关闭模型访问和 LangSmith 跟踪。
-不需要个人电脑保持开机。平台免费资源、休眠与可用性以其当前政策为准，不承诺 SLA。
+The original development checkout keeps its old `origin`. Its additional `public` remote maps `codex/public-release:main`, an independently initialized, reviewed snapshot. Do not push the development `main` directly to the public repository: it contains a different history and unnecessary development files.
 
-官方文档：
-- https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy
-- https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies
+The ignored `.runtime/public-release` checkout is a local publishing workspace. Only committed allowlisted application files are exported, with a SHA-256 manifest. Alternatively, clone the public repository separately to maintain it. No history rewrite or force push is required for routine updates.
 
-## 更新和故障处理
+Community Cloud normally rebuilds or reruns after changes reach the deployed branch. Dependency changes require installation. Check logs for build failures, Python-version differences or invalid entrypoints. Do not post user-upload content or credentials in public issues or logs. Never turn the public app into a proxy to the developer's Ollama service.
 
-原开发仓库继续保留旧 `origin`。新增 `public` remote 默认推送
-`codex/public-release:main`，该分支对应独立、经过审计的公开快照。
-不要直接把开发分支 `main` 推向公开仓库，否则会把原历史和不必要文件一起发布。
-本次公开检出目录位于开发仓库的 `.runtime/public-release`；该目录被忽略，
-不是发布文件的一部分。后续也可从 GitHub 重新克隆公开仓库进行维护。
+## Initial Acceptance Evidence
 
-推送到 `main` 后平台通常自动更新；修改依赖会重新构建。构建失败时先查看管理页面日志，
-核对 Python 版本、依赖与入口。不要把含用户上传内容的日志贴到公开 issue。
-禁止将入口改为本地 AI 服务代理；公开模式的核心功能不需要 Ollama。
+The initial Ubuntu run executed 201 tests with five Windows-only skips and no failures:
+https://github.com/youxing-han/AutoSupply-Copilot/actions/runs/38668565677
+
+The original final local suite passed 202 tests after link and screenshot checks were added. Later documentation changes have their own test records; see repository Actions for the corresponding Linux status.
+
+Online acceptance included stock changes, a 12-item batch, Excel/CSV uploads, default dynamic planning, a five-sheet delay workbook, mitigation comparison, session separation and actual PDF/Excel downloads. A fresh unauthenticated HTTP session reached the public app without a sign-in redirect.
+
+Official deployment reference:
+https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy

@@ -1,108 +1,84 @@
-# 公开发布检查记录
+# Release Audit and Verification Record
 
-检查时间：2026-10-14 至 2026-10-15（Asia/Shanghai）。
+## Original Release Review: 2026-10-14 to 2026-10-15
 
-## 安全审计范围与结论
+Dates use Asia/Shanghai. The observations below describe the original release and are not an assurance that every check was rerun for later documentation changes.
 
-检查了原开发仓库全部可达分支/标签的 36 个提交、297 个历史文件对象，包含已删除文件。
-按凭据文件名、私钥、常见提供商 Token、凭据赋值、联系信息和绝对路径模式扫描；
-对 DOCX/XLSX 展开检查 XML。未发现真实凭据泄露的匹配项，也未发现历史提交过
-`.env`、`secrets.toml`、`.venv` 或 `.runtime`。自动扫描不等同于保证任意格式秘密均能检出。
+### Security Review
 
-发现并处理：
+The development repository's reachable branches and tags were scanned: 36 commits and 297 historical file objects, including deleted files. Checks covered credential filenames, private keys, common provider tokens, credential assignments, contact information and absolute paths. DOCX/XLSX XML was inspected inside archives. No matching real credential exposure was identified; `.env`, `secrets.toml`, `.venv` and `.runtime` were not found in the reviewed history. Pattern scanning cannot guarantee detection of every possible secret.
 
-- 上游实验 XLSX 的工作簿元数据包含机器路径；开发日志包含本地路径。
-- 上游两段视频约 14.8 MB 和 26.5 MB，不是当前汽车零部件应用的必要文件。
-- 旧食品供应链实验、视频、DOCX、上游报告 PDF、旧 CSV 输出及本地开发记录不纳入公开快照。
-- 二进制视频中的数字模式匹配不作为真实联系方式证据；视频整体不发布。
-- 不改写原开发仓库历史，不强制推送。新公开仓库采用白名单应用快照及独立初始提交，
-  保留 MIT 许可证、原作者声明、上游链接及发布文件哈希清单。
-- 扩展 `.gitignore`，忽略环境变量文件变体、凭据文件、数据库、验证环境和测试输出。
+Findings and disposition:
 
-内置汽车零部件、模拟供应商、订单、产线、需求、资格和费用在数据模块、页面、README
-中均注明为虚构。应用未连接企业系统，没有真实采购接口。
+- An upstream experimental workbook contained machine paths in metadata; development logs contained local paths.
+- Two upstream videos were approximately 14.8 MB and 26.5 MB and were unnecessary for the automotive application.
+- Food-supply experiments, videos, DOCX files, upstream report PDFs, old CSV outputs and development records were excluded from the public snapshot.
+- Numeric matches in video binaries were not treated as evidence of real contact details; the videos were excluded entirely.
+- No original history was rewritten and no force push was used. An allowlisted application snapshot with independent history retained the MIT license, original copyright, upstream attribution and a SHA-256 manifest.
+- `.gitignore` was expanded to cover credential-file variants, databases, validation environments and test outputs.
 
-## 运行与安全边界
+The simulated components, suppliers, orders, production lines, demands, qualifications and costs are identified as fictional. No enterprise connection or actual purchasing interface exists.
 
-- `app.py` 默认本地模式；`public_app.py` 在导入工作流之前固定公开模式并关闭模型跟踪。
-- 公开模式服务端禁止模型客户端和助手调用；显式请求模型报告也只返回模板回退。
-- 核心分析、模板下载、Excel/CSV 导入、动态计划、应急比较和 PDF 不依赖 Ollama。
-- 输入、草稿、结果和聊天记录使用 `st.session_state`；未使用跨用户全局数据缓存、
-  共享检查点或数据库。两个独立 AppTest 会话验证输入与聊天互不共享。
-- 上传只在内存处理，不执行代码。5 MB 输入上限、25 MB XLSX 解压上限、200 个内部文件上限；
-  拒绝宏/外部链接，限制单元格文字、列数、批量 SKU 和动态计划数据行数。
-- 上传内容不写磁盘或仓库；公开页面不展示内部 traceback，内部异常日志仅记录异常类型。
-- 程序路径以项目文件位置解析；云端不依赖 Windows 桌面、本机 C 盘或字体文件。
-  PDF 使用 ReportLab 内置的中文 CID 字体声明，不读取开发者 Windows 字体。
+### Runtime and Safety Boundaries
 
-## 实际验证
+- `app.py` defaults to local mode. `public_app.py` fixes public mode before importing workflow modules and disables model tracing.
+- Public mode blocks model clients and assistant calls. Explicit model-report requests return a template fallback.
+- Inventory, templates, Excel/CSV imports, dynamic planning, mitigation and PDF work without Ollama.
+- Inputs, drafts, results and conversations use `st.session_state`, with no shared user-data cache, checkpoint store or database. Two separate AppTest sessions checked input and chat isolation.
+- Uploads are parsed in memory, never executed or saved to the repository. Limits include 5 MB inputs, 25 MB total XLSX decompression and 200 archive entries. Macros and external workbook links are rejected; text, columns, SKU counts and planning rows are bounded.
+- Public pages do not show internal tracebacks. Internal exception logging is limited to exception types.
+- Project-relative paths remove dependence on Windows desktop paths. PDF generation uses ReportLab's Chinese CID font declaration, not the developer's local font files.
 
-| 检查 | 本轮结果 |
+### Original Local Verification
+
+| Check | Recorded result |
 |---|---|
-| Python | 新建独立虚拟环境，CPython 3.11.9 |
-| 安装依赖 | 从 `requirements.txt` 完成真实安装，生成 `requirements.lock.txt` |
-| 导入与依赖一致性 | Streamlit、LangGraph、Ollama 客户端、pandas、Excel、PDF 实际导入；`pip check` 通过 |
-| 全套回归 | 补齐线上链接与截图检查后，最终干净环境 202 项通过，0 失败，99.378 秒 |
-| 新增公开模式测试 | 13 项通过：模型阻断、模板回退、PDF、输入边界、压缩炸弹、跨会话隔离、CSV 表头预校验、发布白名单及截图完整性 |
-| 工作流兼容测试 | 去除对旧 Git 提交的依赖后，3 项通过；新仓库不需要复制旧历史才能测试 |
-| 本地真实浏览器 | 单物料、12 物料批量、30 天动态、订单结果、应急方案区域实际交互 |
-| PDF | 实际点击并下载动态 PDF；不是仅检查按钮存在 |
-| 模拟 Excel / CSV | 模块与 AppTest 覆盖生成、读取、校验及结果复核；线上上传下载须另行验证 |
-| 本地 AI | 实际连接已有 `llama3.2:latest`，对虚构延期情景完成真实问答，11.06 秒；未下载模型或使用付费 API |
-| 桌面脚本 | Windows 脚本测试通过；未修改既有未提交启动/停止脚本，未声称本轮双击验证 |
-| Linux 依赖 | 全部 72 个锁定依赖成功解析并下载 CPython 3.11 Linux wheel；这不是 Linux 启动或云端功能验证 |
-| Linux / 线上 | GitHub Ubuntu CI 成功：运行 201 项，5 项 Windows 专用测试跳过，0 失败；核心业务已完成线上验证，见下文 |
+| Environment | Fresh CPython 3.11.9 virtual environment |
+| Dependencies | Actual installation from requirements; lockfile generated; package imports and `pip check` passed |
+| Final full local regression | 202 tests passed, no failures, 99.378 seconds after online link and screenshot checks |
+| Initial public-mode tests | 13 passed: model blocking, fallback, PDF, upload boundaries, archive limits, isolation, CSV header preflight, release allowlist and screenshots |
+| Workflow portability | Three tests passed after removing dependence on old Git commits |
+| Browser interactions | Single SKU, 12-item batch, 30-day plan, order results and mitigation controls exercised |
+| PDF | Generated and actually downloaded; not inferred from a button's presence |
+| Excel/CSV | Generation, parsing, validation and result checks exercised by modules and AppTest; online evidence recorded separately below |
+| Real local AI | Existing `llama3.2:latest` answered a fictional delay question in 11.06 seconds; no model download or paid API |
+| Desktop launchers | Script tests passed; existing uncommitted launcher changes excluded; no claim of a new shortcut double-click test |
+| Linux packages | All 72 locked packages resolved and downloaded as CPython 3.11 Linux wheels; this alone was not runtime proof |
+| Initial Ubuntu CI | 201 tests executed, five Windows-only skips, no failures |
 
-完整测试最初在受限环境卡于 Windows `socketpair`；在允许本机套接字的验证环境执行后
-完成测试，不将该限制记作业务功能缺陷。首轮上传限制与带说明页的旧 Excel 模板不兼容，
-修复后模板往返与全套回归通过。
+The first restricted-environment full run stalled on Windows socket handling; execution with local sockets permitted completed. A legacy Excel template initially conflicted with upload validation; template round-trip and full regression passed after the fix.
 
-提交前对 80 个候选发布文件再次扫描，未发现提供商 Token、私钥、本机用户路径或私人邮箱匹配项。
-模板元数据作者为 `openpyxl`；候选最大文件约 60 KB。原始仓库中唯一被跟踪的旧实验 PDF
-不在发布白名单，虚拟环境、日志与临时 PDF 均不进入公开版本。
+A pre-release scan of 80 candidate files found no provider-token, private-key, local-user-path or personal-email matches. Template creator metadata was `openpyxl`; the largest candidate was approximately 60 KB at that stage. The 80-file application snapshot plus manifest was approximately 0.8 MB and independently passed 200 tests in 80.856 seconds without the original development history. Four later online captures brought the release allowlist to 84 application files. These are historical counts, not the current manifest's count.
 
-实际导出快照含 80 个应用文件和一个 SHA-256 清单，共约 0.8 MB。
-在不带原 Git 历史的快照目录独立执行 200 项测试，全部通过，80.856 秒。
-本地工作区原有的三个启动/停止脚本相关未提交修改没有进入发布提交；快照使用它们的已提交版本。
-补入四张线上截图后，最终发布白名单为 84 个应用文件，重新扫描未发现凭据或私人联系信息匹配项。
+Three existing, uncommitted launcher-related files were preserved outside release commits; the snapshot used their committed versions. Local public-mode captures were `public-single.jpg`, `public-batch.jpg` and `public-planning.jpg`. The four `online-*.jpg` captures came from actual cloud interaction.
 
-截图为干净环境运行 `public_app.py` 后实际保存的浏览器页面，路径为
-`docs/screenshots/public-single.jpg`、`public-batch.jpg`、`public-planning.jpg`。
-这些是本地公开模式截图。另有 `online-single.jpg`、`online-batch.jpg`、
-`online-planning.jpg` 和 `online-mitigation.jpg` 为 Streamlit 云端实际交互截图。
+## Initial GitHub and Online Acceptance: 2026-10-15
 
-## GitHub 与线上验收（2026-10-15）
+- Repository: https://github.com/youxing-han/AutoSupply-Copilot ; API confirmed Public and push succeeded.
+- Application: https://autosupply-copilot.streamlit.app/ ; Community Cloud, Python 3.11, `public_app.py`.
+- Initial Ubuntu run: https://github.com/youxing-han/AutoSupply-Copilot/actions/runs/38668565677 ; 201 tests, five skips, zero failures, 61.575 seconds; `pip check` passed.
+- A fresh HTTP session without pre-existing cookies or authorization reached both the root and application frame with status 200 and no sign-in redirect.
+- Single SKU: changing stock from 800 to 160 and rerunning produced two days of coverage, a five-day coverage gap and 640 reference replenishment units.
+- Batch: 12 demo items completed without failures; a five-item XLSX and a fictional CSV with the distinct identifier `CLOUD-CSV-TEST` produced five and one successful analyses respectively.
+- Planning: the default 12-item, 30-day plan ran. An uploaded five-sheet, five-SKU, 14-day delay workbook produced a first sensor shortage on 2026-10-22, 80 unmet units and 260 closing units. Its original-date reference had zero unmet demand and 180 closing units; 500 confirmed receipt units and pending orders were shown separately.
+- Mitigation: backup supply plus internal transfer left zero unmet demand at CNY 2,980. A late low-price option left 80 unmet units; expediting cost CNY 6,000. No real procurement took place.
+- AI: the public app displayed the unavailable-local-Ollama notice while templates, facts and analysis remained available.
+- Session separation: changing stock to 160 in one tab did not change another new tab's default 800 or expose the first tab's uploaded draft.
+- PDF: the actual online single-SKU PDF was 4,205 bytes and one page. Text extraction found Chinese text, SEN-001 and stock 800. Poppler rendering showed no clipping, overlap or missing pages. It substituted a local Chinese font; compatibility with every PDF reader was not verified.
+- Excel: the actual cloud-generated workbook was 6,251 bytes, 12 rows, 14 columns and 12 unique SKUs. Reuploading the downloaded file and running analysis produced 12 results, six high-risk items and no failures.
 
-- GitHub：https://github.com/youxing-han/AutoSupply-Copilot ，API 确认为 Public，推送成功。
-- 在线演示：https://autosupply-copilot.streamlit.app/ ，Community Cloud，Python 3.11，入口 `public_app.py`。
-- 首次 Ubuntu CI：https://github.com/youxing-han/AutoSupply-Copilot/actions/runs/38668565677 ，
-  201 项执行，5 项跳过，0 失败，61.575 秒，`pip check` 通过。
-- 使用全新 requests 会话、无预存 Cookie 或授权头，根地址及应用框架均返回 200，未跳转登录页。
-- 单物料：线上库存从 800 改为 160 后重新运行，覆盖 2 天、潜在缺口 5 天、参考补货 640 件。
-- 批量：12 物料演示运行成功，失败数 0；上传五物料 XLSX 后成功分析 5 项；
-  上传带 `CLOUD-CSV-TEST` 独立标识的虚构 CSV 后成功分析 1 项。
-- 动态：默认 12 物料、30 天计划运行成功；上传五表、5 SKU、14 天延期计划后，
-  传感器首次缺料 2026-10-22，累计未满足需求 80 件，期末可用 260 件；
-  按原计划到货对照为未满足 0、期末 180。已确认到货 500 件；待确认订单单独展示。
-- 应急比较：线上实际计算“备用来源供货 + 内部调拨”，残余缺料 0，增量成本 2980 元；
-  延迟低价方案仍残余 80 件，加急方案增量成本 6000 元。没有执行真实采购。
-- AI：线上明确提示不支持本地 Ollama；模板报告、事实卡与核心分析正常。
-- 会话：一个浏览器标签改为库存 160，另一个新标签仍为默认 800；前者上传草稿没有出现在后者。
-- PDF：从线上应用原生页面实际下载单物料 PDF（4205 字节、1 页），pypdf 提取出中文、
-  SEN-001 和库存 800；Poppler 渲染后目视核对无裁切、重叠或缺页。渲染器将 STSong-Light
-  替换为本机宋体，中文可读；未宣称已验证所有 PDF 阅读器的字体兼容性。
-- Excel：实际下载云端生成的模拟工作簿（6251 字节），openpyxl/pandas 读取为 12 行、14 列、
-  12 个唯一 SKU；原文件重新上传并运行后，12 项分析完成，高风险 6、失败 0。
+Browser automation initially failed to capture downloads through the outer cloud iframe. Retrying on the native application page produced actual downloaded files; the initial timeout was not counted as download success.
 
-浏览器自动化最初无法从 Community Cloud 外层 iframe 捕获下载事件；从同一应用原生页面
-重试后获得实际下载文件。该自动化限制不当作“下载成功”的证据，后续以落盘文件核对为准。
+## Documentation and Screenshot Refresh: 2026-10-23
 
-## 许可证与已知限制
+The README gallery was replaced by four fresh local public-mode browser captures. The 12-component delay plan, HRN-006 detail, original-date reference and mitigation comparison were actually operated. Data, captions and reproduction steps are recorded in `SCREENSHOTS.md`. The English documentation preserves the fictional-data, deterministic-calculation, local-AI and business-model boundaries.
 
-保留上游 Cindy Aprilia 的 MIT 声明；直接依赖的许可见 `THIRD_PARTY_NOTICES.md`。
-检查安装环境的许可证元数据及缺失元数据包的包内 LICENSE：Jinja2 与 itsdangerous 为 BSD，
-构建环境 setuptools 不随源码发布。传递依赖包含 MIT、BSD、Apache、PSF 和 MPL 等许可；
-应用未打包或修改这些库，安装包保留其许可文件。未将许可证兼容性检查描述为法律意见。
+This refresh does not constitute a new full cloud acceptance, real-model run, concurrency test or download verification. Its checks cover public documentation, screenshot assets and public release behavior; current test and push results belong to the corresponding commit and Actions run.
 
-未执行并发压力或专业渗透测试；免费云端可用性和休眠行为取决于平台。
-不承诺真实企业预测效果，不处理敏感业务数据。
+The refreshed development checkout passed 205 tests in 111.204 seconds, with no failures. The 16-test public-release suite also passed, including an automated reproduction of the gallery's component counts, shortage quantities, reference inventory and mitigation costs. The 91 candidate application files were scanned again, with no credential, private-key, personal-machine-path or private-contact pattern matches. Historical image files remain available but are no longer displayed in the README gallery.
+
+## Attribution and Remaining Limits
+
+The original Cindy Aprilia MIT copyright remains in `LICENSE`; dependency notices are in `THIRD_PARTY_NOTICES.md`. Installed license metadata and package license files were reviewed. Transitive dependencies include MIT, BSD, Apache, PSF and MPL licenses; library distributions retain their notices and are not bundled into this source snapshot. Build-environment setuptools is not shipped. This records the review scope, not a legal opinion.
+
+No concurrency stress test or professional penetration test was performed. Free cloud availability and sleep behavior depend on the platform. There is no enterprise-data validation, forecast-accuracy guarantee, realized savings claim or support for sensitive business data.

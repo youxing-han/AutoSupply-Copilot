@@ -17,4 +17,4 @@ from https://ollama.com/, pull llama3.2, and start the local service.
 
 Public demo: replace app.py with public_app.py. It blocks local model access.
 Cloud entrypoint: public_app.py, branch main, Python 3.11; no secrets required.
-See README.md and docs/DEPLOYMENT.md for Chinese instructions and limitations.
+See README.md and docs/DEPLOYMENT.md for usage instructions and limitations.

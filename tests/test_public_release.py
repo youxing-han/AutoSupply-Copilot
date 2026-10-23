@@ -1,7 +1,6 @@
 import io
 import os
 import re
-import struct
 import sys
 import unittest
 from copy import deepcopy
@@ -40,16 +39,52 @@ class PublicCapabilityTests(unittest.TestCase):
             path = ROOT / "docs/screenshots" / f"online-{mode}.jpg"
             self.assertGreater(path.stat().st_size, 10_000)
             self.assertEqual(path.read_bytes()[:3], b"\xff\xd8\xff")
-        for name in ("material-risk-overview.png", "time-phased-inventory.png"):
+        for name in ("demo-risk-dashboard.jpg", "demo-inventory-projection.jpg",
+                     "demo-delivery-scenario.jpg", "demo-mitigation-tradeoffs.jpg"):
             relative = f"docs/screenshots/{name}"
             content = (ROOT / relative).read_bytes()
             self.assertIn(relative, readme)
-            self.assertEqual(content[:8], b"\x89PNG\r\n\x1a\n")
-            width, height = struct.unpack(">II", content[16:24])
+            self.assertEqual(content[:3], b"\xff\xd8\xff")
+            from PIL import Image
+            width, height = Image.open(io.BytesIO(content)).size
             self.assertGreaterEqual(width, 1200)
             self.assertGreaterEqual(height, 600)
+        self.assertNotIn("material-risk-overview.png", readme)
+        self.assertNotIn("time-phased-inventory.png", readme)
         for relative in re.findall(r"!\[[^\]]*\]\((docs/screenshots/[^)]+)\)", readme):
             self.assertTrue((ROOT / relative).is_file(), relative)
+
+    def test_public_documentation_is_english_and_retains_model_boundaries(self):
+        for relative in ("README.md", "INSTALLATION.txt", "THIRD_PARTY_NOTICES.md",
+                         "docs/LOCAL_USAGE.md", "docs/DEPLOYMENT.md",
+                         "docs/RELEASE_AUDIT.md", "docs/SCREENSHOTS.md"):
+            text = (ROOT / relative).read_text(encoding="utf-8")
+            self.assertIsNone(re.search(r"[\u4e00-\u9fff]", text), relative)
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        for phrase in ("fictional", "Deterministic Python", "Chinese-language interface",
+                       "AI-assisted", "Unmet demand does not roll forward", "CNY 6,000"):
+            self.assertIn(phrase, readme)
+
+    def test_gallery_caption_values_match_reproducible_scenario(self):
+        from demo_data import build_rich_planning
+        from planning_data import analyze_planning_bundle, normal_arrival_baseline
+        from mitigation import build_mitigation_demo, compare_mitigations
+
+        bundle = build_rich_planning("2026-10-12", 30, "供应商交付延迟")
+        analysis = analyze_planning_bundle(bundle)
+        projections = [item["inventory_projection"] for item in analysis["details"].values()]
+        self.assertEqual(len(projections), 12)
+        self.assertEqual(sum(p["total_unmet_demand"] > 0 for p in projections), 3)
+        self.assertEqual(sum(p["total_unmet_demand"] for p in projections), 831)
+        result = analysis["details"]["HRN-006"]
+        projection = result["inventory_projection"]
+        self.assertEqual((projection["total_unmet_demand"], projection["final_available"]), (613, 1492))
+        reference = analyze_planning_bundle(normal_arrival_baseline(bundle))["details"]["HRN-006"]["inventory_projection"]
+        self.assertEqual((reference["total_unmet_demand"], reference["final_available"]), (0, 879))
+        comparison = compare_mitigations(result["selected_part"], result["planning_input"], build_mitigation_demo(result))
+        self.assertEqual((comparison["recommended"]["residual_unmet"], comparison["recommended"]["incremental_cost"]), (0, 6000))
+        late = next(s for s in comparison["scenarios"] if s["candidate_ids"] == ["SIM-LATE"])
+        self.assertEqual((late["residual_unmet"], late["incremental_cost"]), (375, 613))
 
     @patch.dict(os.environ, {"AUTOSUPPLY_MODE": "public"})
     def test_no_model_constructor_even_for_explicit_report_request(self):
@@ -96,7 +131,9 @@ class UploadSafetyTests(unittest.TestCase):
         for path in (".env", ".streamlit/secrets.toml", ".venv/a.py", ".runtime/result.pdf", "docs/development_progress.md", "Documentation/movie.mp4", "docs/design.docx", "simulation/results/data.csv"):
             self.assertFalse(builder.allowed(path), path)
         for path in ("LICENSE", "public_app.py", "agent/agents.py", "templates/autosupply_dynamic_demo.xlsx",
-                     "docs/screenshots/material-risk-overview.png", "docs/screenshots/time-phased-inventory.png"):
+                     "docs/SCREENSHOTS.md", "docs/screenshots/demo-risk-dashboard.jpg",
+                     "docs/screenshots/demo-inventory-projection.jpg", "docs/screenshots/demo-delivery-scenario.jpg",
+                     "docs/screenshots/demo-mitigation-tradeoffs.jpg"):
             self.assertTrue(builder.allowed(path), path)
 
     def test_batch_csv_and_excel_roundtrip(self):

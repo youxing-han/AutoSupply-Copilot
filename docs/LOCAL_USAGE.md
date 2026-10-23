@@ -1,76 +1,49 @@
-# AutoSupply Copilot
+# User Guide
 
-## 中文工作台操作说明（2026-10-14）
+The application UI is in Chinese. This English guide describes the workflow; screenshot captions do not change the UI language.
 
-正式页面已按三模式网站原型重新排版：深绿页眉、浅绿背景、白色数据区，顶部始终可切换
-**单物料分析 / 多物料批量分析 / 动态物料计划**。修改输入后需要点击对应的运行按钮；
-在同一数据来源内修改参数，页面保留上次成功分析，并提示结果是否过期。切换数据来源时隐藏旧来源的
-指标、报告、导出和 AI 问答，显示“等待输入并运行分析”；核对当前来源的数据后重新运行。
-各来源草稿仍独立保留；仅切换顶部分析模式再返回，不会清除同一来源的有效结果。
-首次打开单物料模式提供可运行的正常供应示例。
+## Choose an Analysis Mode
 
-本轮按确认后的页面讨论稿进一步整理：输入框在未点击时也有可见边框；风险用**红色高风险、
-橙色中风险、绿色低风险**标签区分，并始终保留文字。单物料结果按“关键指标 → 库存曲线 →
-建议措施”排列，AI助手在参数与结果下方占满一行。批量页面在左侧风险图下方提供智能问答，
-右侧查看选中物料详情；动态页面上方为左侧风险摘要、右侧AI助手，下方全宽展示单物料详析。
-管理报告、分析过程和结果导出在页面底部并排放置。
-三个模式的主要左右区域等宽、同高，顶边和底边对齐；批量页把风险图与AI整合为同一张左侧面板。
-单物料页的过期提示位于双栏上方，避免提示把右栏向下推。批量页情景选择、加载和运行同排，编辑与完整预览开关同排。
-单物料尚未运行时，右侧保留与参数区对齐的等待面板，提供输入与运行提示。批量运行按钮在普通
-刷新时保持挂载，避免切换预览或翻页时闪烁；中文编辑表格底部保留安全间距，翻页按钮边框完整显示。
+- **Single SKU:** Edit inventory, average daily demand, procurement lead time, safety days, supplier status and material criticality, then run analysis. Outputs include coverage, the lead-time coverage gap and a reference replenishment quantity. This static model excludes purchase orders.
+- **Batch screening:** Use the built-in data, enter your own fictional rows or import Excel/CSV. Run analysis to obtain risk priorities and component details. Up to 50 SKUs are supported.
+- **Dynamic planning:** Use the 12-component planning dataset or the five-component formula-verification fixture. Choose a scenario, start date and horizon, load inputs, inspect inventory, demand and orders, then run analysis.
 
-数据来源使用统一名称；单物料提供前两项，批量与动态提供全部三项：
+## Load, Edit, Run
 
-- **演示数据**：选择业务情景，加载后直接运行；也可在样例上编辑。
-  批量模式首次进入已准备12种参考物料，无需上传或再次加载，核对后即可运行。
-  只读预览每页10行；打开“编辑本次输入数据”可修改样例。切换演示情景后需点击“加载参考数据”。
-  “全部预览输入数据”显示完整业务字段，仍按每页10行展示；12种物料分为10行和2行两页，计算始终使用全部数据。
-- **业务数据录入**：填写物料与业务参数，不必选择演示情景。单物料只填写和分析一种物料；
-  批量、动态可新增/删除物料。动态先填主数据，再点击“建立或重建逐日需求表（初始全为0）”，
-  逐日填写实际需求和采购订单；重建会覆盖需求并保留订单。确认来源需要勾选资格已核验。
-- **文件导入**：批量支持 Excel/CSV，动态支持多工作表 Excel。两页均有“导入业务数据”按钮。
-  单物料不设文件导入，避免把多物料表格带入单项表单。导入只准备数据，
-  检查后点击运行。表格、上传提示、订单状态、风险名称和编辑操作使用中文。
+Loading a demonstration or importing a file prepares inputs; it does not automatically analyze them. After changing dates or a scenario, reload the demonstration before running. Manual inputs use the corresponding plan-rebuild control to apply a new horizon.
 
-**动态演示推荐流程**：演示数据 → 多物料排产（12种）→ 选择平稳排产、供应商延期、排产高峰、
-订单待确认、周末检修或集中到货 → 加载演示数据 → 在上方物料、逐日需求、采购到货表核对或编辑 →
-运行动态分析 → 在下方风险清单与物料详情查看结果。左侧可直接询问当前物料；展开“场景与应急方案比较”
-可比较基准及既有应急措施。默认30天，支持1—90天；订单计划不随查看周期增加而凭空改变。
-曲线变化由工作日排产、周末减产、需求高峰及分批到货计算得出，不使用随机抖动或手绘结果。
+Edits within one source preserve drafts and the previous successful result, marked as outdated. Switching sources hides the previous source's results, exports and AI context. Each source retains its own draft. Results reflect the last explicit analysis, not unsubmitted edits.
 
-**公式核验数据包**保留五种物料的原有四情景：SEN-001库存800、日需求80，第8天收货500件；
-14天期末180且没有数量缺口。改为第12天到货后，累计未满足80件。30天正常到货仍有1100件缺口。
-该数据包与12种物料排产包是不同的业务输入，不应混用两组数字解释。
+## Demand and Purchase Orders
 
-**Excel流程**：下载带数据示例 → 在Excel修改 → 文件导入（或“导入业务数据”）→ 上传 → 预览 → 运行。
-下载示例对应上方选择的演示数据包，**不是导出页面已编辑的草稿**。表头保留后端兼容字段；
-订单状态也可填写“已确认 / 待确认 / 已取消”，关键程度可填“高 / 中 / 低”，供应商状态支持中文。
-上传控件限制5MB，动态工作簿读取限制5MB。草稿保留在当前会话，关闭页面或重启服务前请自行保存必要输入。
+Dynamic planning accepts 1-90 days. Calendar editing uses Monday-Sunday weeks; dates outside the horizon are placeholders excluded from calculations. Missing in-horizon values are rejected rather than silently treated as zero. Week and day totals include all filtered items, not just the visible page. Excel demand data use `part_code,date,quantity` rows.
 
-**逐日需求按自然周展示**：固定周一至周日，不以预测首日重新排列星期。若从周三开始，周一、周二
-显示灰色0并标注“非预测期”；周期结束后的空位同理。占位不进入需求表和库存计算。预测期内缺少
-记录仍显示“待填”并拒绝分析，不自动当作零需求。可筛选物料、选择自然周、切换明细列表和编辑；
-周合计与每日合计包括全部筛选物料，不只计算当前预览页。模板仍用 `part_code,date,quantity` 长表，
-方便 Excel 编辑和上传。动态不要求填写日均需求或标准交期：日均由完整计划计算，标准交期可选，
-不参与逐日库存、缺料日期和动态风险规则。旧版含这两列的模板仍兼容。
+Average daily demand is calculated from the complete plan. Standard lead time is not needed for daily inventory projections. Only confirmed orders contribute receipts; pending and cancelled orders remain separate. Confirmed open quantity is not evidence of shipment, and receipts outside the horizon do not become in-period supply.
 
-**多物料结果**：默认卡片总览，每页6种；可切换全部展示或表格，按高/中/低风险筛选，并搜索编码、
-名称或供应商。点击卡片展开单项详析。动态卡片及详情保留库存、确认到货、待确认订单、需求曲线
-和收货标记；“已确认未到货”不是已发运的物流证明，当前未接入承运商或快递追踪。
-动态详析的“库存变化与风险 / 采购到货明细”页签减少纵向堆叠。风险摘要的柱形长度表示预测期内
-累计未满足需求；全为0时直接说明本期没有数量短缺，并另列安全库存预警。中风险可能来自库存
-低于安全阈值或供应商异常，不等同于已经缺料、停线。
-所有数据表（包括输入预览、风险结果、供应商、订单、逐日明细、报告、应急方案和周需求矩阵）统一每页最多10行，
-不足10行显示实际记录，不填充虚构行。翻页保留草稿及分析快照，周计划合计仍包含全部筛选物料；卡片总览的分页独立于数据表。
+## Review Results
 
-**智能问答**：仅保留最近一组问答。切换模式、来源、情景、物料或修改输入会清理旧问题；输入已改时
-先重新分析，再询问新结果。正常查看同一快照不会反复调用模型。桌面启动优先使用已安装的 Chrome，
-找不到时回退系统浏览器，不改变 Windows 默认浏览器。
+Cards show six items per page, with an option to display all. Filter by risk or search for an item or supplier; switch to a table if preferred. All data tables paginate at ten rows without reducing calculations. Select a component for daily inventory curves and purchase-order details.
 
-**智能解读**：先完成分析，再选择快捷问题或输入问题并发送。可点击“检查本地模型连接”。
-本次复现了模型重复数字而触发旧安全校验的故障：保留数字校验，增加受JSON结构约束的核验条目重试，
-不显示被拒绝的模型原文，不让模型生成业务数值。动态说明也采用受约束的条目选择。
-断开本地模型不会影响库存计算、PDF或工作流轨迹。没有模型下载、升级、付费接口或实际采购操作。
+The risk-priority chart ranks cumulative unmet demand. Medium risk can reflect a safety-stock or supplier warning without a quantity shortage. Aggregated units across different components are not lost vehicle output.
 
-桌面启动/停止快捷方式继续可用；启动脚本调用新增的 Chrome 优先打开工具，停止逻辑保留。
-也可使用项目 README 中的虚拟环境命令启动。
+Expand scenario comparison to overlay an original-date receipt reference, which restores original dates for non-cancelled orders and assumes confirmation. This is a comparison assumption, not a promise of arrival. Enable mitigation assessment to compare fixed-lot expediting, backup supply and transfers. Inspect eligibility, dates, remaining shortages and incremental costs before interpreting a recommendation.
+
+## Import and Export
+
+Download a populated template, edit simulated values in Excel, upload and preview, then run. A downloaded example represents the selected demonstration dataset, not the current edited draft. Preserve the workbook sheets and compatible column fields. Dynamic workbooks contain settings, parts, suppliers, demands and orders.
+
+Downloads include CSV risk results, mitigation comparisons and PDF reports. Uploads are limited to 5 MB and held in session memory. Save necessary inputs and outputs before closing the session or restarting the service.
+
+## Local AI
+
+Run the analysis first, then ask a question about the current snapshot. Changing mode, source, item, scenario or inputs clears stale conversation context. The interface keeps the latest question-and-answer pair; ordinary viewing does not repeatedly call the model.
+
+The local model only explains facts. Numeric and action-claim checks reject certain responses, with a constrained JSON explanation-key retry. Dynamic explanations also use constrained selection. Model failure leaves the deterministic results and exports available. Public mode blocks model access and displays an availability notice.
+
+## Reproducible Calculation Fixture
+
+The five-component fixture uses SEN-001 with 800 opening units, demand of 80 per day and a receipt of 500 on day eight. Over 14 days it leaves 180 units and no unmet demand. Delaying receipt to day twelve produces 80 unmet units. A 30-day horizon changes the result; do not mix this fixture with the 12-component dataset.
+
+## Desktop Launchers
+
+Optional Windows shortcuts can start or stop the application. The launcher prefers installed Chrome and otherwise uses the system browser without changing its default. Cloud execution does not depend on these shortcuts. Installation commands are in the repository README.
