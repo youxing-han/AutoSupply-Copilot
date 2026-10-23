@@ -21,6 +21,15 @@ from upload_safety import validate_upload
 
 
 class PublicCapabilityTests(unittest.TestCase):
+    def test_attribution_files_preserved_outside_readme(self):
+        license_text = (ROOT / "LICENSE").read_text(encoding="utf-8")
+        notices = (ROOT / "THIRD_PARTY_NOTICES.md").read_text(encoding="utf-8")
+        self.assertIn("Cindy Aprilia", license_text)
+        self.assertIn("Permission is hereby granted", license_text)
+        self.assertIn("https://github.com/cinapr/SupplyChainAgenticAI", notices)
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        self.assertNotIn("## 开源来源与许可", readme)
+
     def test_published_links_and_screenshots_are_complete(self):
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("https://autosupply-copilot.streamlit.app/", readme)

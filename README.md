@@ -144,9 +144,3 @@ Linux / macOS 使用 `.venv/bin/python` 执行同一命令，Windows 启动脚�
 - 应急方案按单 SKU、固定数量穷举；不含跨 SKU 共用产能优化、税费、停线损失或连续订货量求解。
 - 风险与推荐依赖输入质量和简化规则，没有经过真实企业数据实证评估。
 - 本地小模型的解释可能失败，校验只能约束部分错误，业务数值始终以 Python 结果为准。
-
-## 开源来源与许可
-
-本项目基于 [Cindy Aprilia / SupplyChainAgenticAI](https://github.com/cinapr/SupplyChainAgenticAI) 二次开发。本地保留原始食品供应链实验作为来源参考；公开演示快照仅包含当前汽车零部件应用所需文件，不包含上游视频和旧实验结果。来源信息见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
-
-遵循 [MIT License](LICENSE)，保留原作者版权声明。第三方 Python 依赖遵循各自许可证。公开发布不代表对上传资料或第三方素材取得额外使用权。
