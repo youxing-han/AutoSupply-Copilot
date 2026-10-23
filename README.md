@@ -1,12 +1,14 @@
 # AutoSupply Copilot
 
-**汽车零部件供应风险与动态物料计划决策支持演示系统**
+**汽车零部件供应风险与物料计划决策支持平台**
 
-面向库存监控、供应商延期和生产需求变化等场景，将零部件库存、需求计划和采购到货计划转换为可核验的风险指标、库存曲线与应急方案对照。适合供应链岗位项目展示及业务模型学习。
+*Automotive Supply Risk & Material Planning Decision Support*
+
+面向汽车零部件供应保障，将现有库存、分期需求与采购到货计划整合为逐日供需视图，识别缺料时点、安全库存预警与交付偏差影响。通过多物料风险看板、情景模拟和应急方案比较，支持从风险定位到物料详析、方案评估与报告输出的分析流程。
 
 > 内置零部件、供应商、订单、产线、成本和需求记录均为完全虚构的模拟数据。系统未接入 ERP/SAP、承运商或企业数据库，不会执行采购、发运、调拨或供应商操作。公开演示请仅使用模拟或非敏感数据。
 
-AutoSupply Copilot is an automotive supply-risk and material-planning demo built with Streamlit and LangGraph. Deterministic Python rules calculate business results; an optional local Ollama model explains verified facts.
+AutoSupply Copilot is a scenario-based decision-support demo for automotive material availability. It combines multi-SKU risk visibility, time-phased inventory analysis and supply mitigation comparison. Business metrics are calculated by deterministic Python rules; an optional local Ollama model explains the results.
 
 ## 项目解决的问题
 
@@ -30,6 +32,37 @@ AutoSupply Copilot is an automotive supply-risk and material-planning demo built
 | 本地 AI 解读 | Ollama `llama3.2` 基于当前分析快照回答问题；校验失败或服务不可用时保留业务结果 |
 
 默认演示包含 12 种虚构零部件，可选择平稳排产、供应商延期、排产高峰、订单待确认、周末检修和集中到货等情景。输入预览与结果表每页最多 10 行，分页不减少实际参与计算的记录。
+
+## 真实页面展示 · Product Walkthrough
+
+以下两张为项目使用者提供的真实运行页面截屏，直接展示应用中的虚构零部件数据；并非概念效果图。两图展示不同分析快照，不应把数值当作同一次运行的上下游结果。点击图片可查看原图。
+
+### 多物料风险看板 · Material Risk Dashboard
+
+从物料组合视角并列呈现风险等级、期初库存、确认到货、待确认数量、首次缺料与未满足需求，并以库存趋势卡片辅助横向比较。支持从总体浏览进入单物料详析，便于定位需要进一步检查的供给与库存缓冲问题。
+
+[![多物料风险看板：零部件风险等级、在途供给与库存趋势](docs/screenshots/material-risk-overview.png)](docs/screenshots/material-risk-overview.png)
+
+### 逐日供需与库存分析 · Time-Phased Inventory Analysis
+
+将预计可用库存、计划需求、确认到货、未满足需求与安全库存阈值叠加到同一时间轴，观察到货节奏与需求消耗的匹配情况。下图的散热器总成在预测期内未出现数量短缺，但有 2 天期末库存低于安全库存阈值，体现“缺料风险”与“库存缓冲预警”的区别。
+
+[![逐日库存分析：预计可用库存、需求、采购到货与安全库存阈值](docs/screenshots/time-phased-inventory.png)](docs/screenshots/time-phased-inventory.png)
+
+<details>
+<summary>更多真实页面与历史验收截图 · More Screenshots</summary>
+
+以下三张为本地公开模式运行截图：
+
+![单物料分析](docs/screenshots/public-single.jpg)
+
+![多物料批量分析](docs/screenshots/public-batch.jpg)
+
+![动态物料计划](docs/screenshots/public-planning.jpg)
+
+另有 [线上单物料](docs/screenshots/online-single.jpg)、[线上 Excel 分析](docs/screenshots/online-batch.jpg)、[线上动态计划](docs/screenshots/online-planning.jpg) 和 [线上应急方案](docs/screenshots/online-mitigation.jpg) 的实际验收截图。相关验证范围见 [发布检查记录](docs/RELEASE_AUDIT.md)。
+
+</details>
 
 ## 在线演示与本地模式
 
@@ -102,20 +135,6 @@ Linux / macOS：
 本地预览公开模式：将上述启动命令的 `app.py` 换成 `public_app.py`。也可通过 `AUTOSUPPLY_MODE=public` 配置 `app.py`；未设置时默认为本地模式。两个模式应使用独立服务进程。
 
 Windows 桌面快捷方式可由 `scripts/create_desktop_shortcuts.ps1` 创建。完整操作说明见 [本地使用指南](docs/LOCAL_USAGE.md)。
-
-## 真实页面截图
-
-以下是项目实际运行页面，不是效果图。截图来源和验证范围见 [发布检查记录](docs/RELEASE_AUDIT.md)。
-
-以下三张为本地公开模式截图；另有 [线上单物料](docs/screenshots/online-single.jpg)、
-[线上 Excel 分析](docs/screenshots/online-batch.jpg)、[线上动态计划](docs/screenshots/online-planning.jpg)
-和 [线上应急方案](docs/screenshots/online-mitigation.jpg) 的实际验收截图。
-
-![单物料分析](docs/screenshots/public-single.jpg)
-
-![多物料批量分析](docs/screenshots/public-batch.jpg)
-
-![动态物料计划](docs/screenshots/public-planning.jpg)
 
 ## 技术与开发方式
 

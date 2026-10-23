@@ -1,5 +1,7 @@
 import io
 import os
+import re
+import struct
 import sys
 import unittest
 from copy import deepcopy
@@ -38,6 +40,16 @@ class PublicCapabilityTests(unittest.TestCase):
             path = ROOT / "docs/screenshots" / f"online-{mode}.jpg"
             self.assertGreater(path.stat().st_size, 10_000)
             self.assertEqual(path.read_bytes()[:3], b"\xff\xd8\xff")
+        for name in ("material-risk-overview.png", "time-phased-inventory.png"):
+            relative = f"docs/screenshots/{name}"
+            content = (ROOT / relative).read_bytes()
+            self.assertIn(relative, readme)
+            self.assertEqual(content[:8], b"\x89PNG\r\n\x1a\n")
+            width, height = struct.unpack(">II", content[16:24])
+            self.assertGreaterEqual(width, 1200)
+            self.assertGreaterEqual(height, 600)
+        for relative in re.findall(r"!\[[^\]]*\]\((docs/screenshots/[^)]+)\)", readme):
+            self.assertTrue((ROOT / relative).is_file(), relative)
 
     @patch.dict(os.environ, {"AUTOSUPPLY_MODE": "public"})
     def test_no_model_constructor_even_for_explicit_report_request(self):
@@ -83,7 +95,8 @@ class UploadSafetyTests(unittest.TestCase):
         spec.loader.exec_module(builder)
         for path in (".env", ".streamlit/secrets.toml", ".venv/a.py", ".runtime/result.pdf", "docs/development_progress.md", "Documentation/movie.mp4", "docs/design.docx", "simulation/results/data.csv"):
             self.assertFalse(builder.allowed(path), path)
-        for path in ("LICENSE", "public_app.py", "agent/agents.py", "templates/autosupply_dynamic_demo.xlsx"):
+        for path in ("LICENSE", "public_app.py", "agent/agents.py", "templates/autosupply_dynamic_demo.xlsx",
+                     "docs/screenshots/material-risk-overview.png", "docs/screenshots/time-phased-inventory.png"):
             self.assertTrue(builder.allowed(path), path)
 
     def test_batch_csv_and_excel_roundtrip(self):
